@@ -45,7 +45,7 @@ namespace MMFixes
             {
                 Logger.Error("Scouting browse keys failed to start: " + e.Message);
             }
-            Logger.Log("Motorsport Manager Fixes 1.2.0 loaded: car follows race seat; car opinions kept fresh; scouting list browsing and marketability column.");
+            Logger.Log("Motorsport Manager Fixes 1.3.0 loaded: car follows race seat; car opinions kept fresh; scouting list browsing and marketability column; pit crew Renew All.");
             return true;
         }
 
