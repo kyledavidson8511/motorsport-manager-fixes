@@ -1,0 +1,9 @@
+{
+  "Id": "MMFixes",
+  "DisplayName": "Motorsport Manager Fixes & QoL",
+  "Author": "Kyle & Claude",
+  "Version": "1.2.0",
+  "ManagerVersion": "0.27.0",
+  "AssemblyName": "MMFixes.dll",
+  "EntryMethod": "MMFixes.Main.Load"
+}
