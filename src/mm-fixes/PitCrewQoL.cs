@@ -45,14 +45,36 @@ namespace MMFixes
             GameObject go;
             if (existing == null)
             {
-                go = (GameObject)UnityEngine.Object.Instantiate(screen.automanageButton.gameObject);
+                // Copy it while the source is switched off, so the copy starts inactive and none of
+                // the inherited scripts run before they're stripped.
+                GameObject source = screen.automanageButton.gameObject;
+                bool wasActive = source.activeSelf;
+                source.SetActive(false);
+                try
+                {
+                    go = (GameObject)UnityEngine.Object.Instantiate(source);
+                }
+                finally
+                {
+                    source.SetActive(wasActive);
+                }
                 go.transform.SetParent(parent, false);
                 go.name = ButtonName;
-                // Labels that re-localise themselves on enable would overwrite our text.
-                foreach (UILocaliseLabel l in go.GetComponentsInChildren<UILocaliseLabel>(true))
+                // 1.3.1: strip every game script the copy inherited (tooltip trigger, localised labels,
+                // ...). They were wired up for the Auto Manage button only; the copied tooltip trigger
+                // has no tooltip and threw NullReferenceException every frame, which took the game down.
+                // Only Unity's own parts stay: Button, Image, TextMeshPro, layout.
+                System.Reflection.Assembly game = typeof(UITooltipTrigger).Assembly;
+                List<string> stripped = new List<string>();
+                foreach (MonoBehaviour mb in go.GetComponentsInChildren<MonoBehaviour>(true))
                 {
-                    UnityEngine.Object.Destroy(l);
+                    if (mb != null && mb.GetType().Assembly == game)
+                    {
+                        stripped.Add(mb.GetType().Name);
+                        UnityEngine.Object.DestroyImmediate(mb);
+                    }
                 }
+                Main.LogOnce("renew-all-strip", "QoL (renew all): removed copied game scripts: " + (stripped.Count > 0 ? string.Join(", ", stripped.ToArray()) : "none") + ".");
                 LayoutElement le = go.GetComponent<LayoutElement>() ?? go.AddComponent<LayoutElement>();
                 le.ignoreLayout = true;
 
